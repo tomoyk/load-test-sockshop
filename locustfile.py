@@ -1,6 +1,6 @@
 import base64
 
-from locust import HttpLocust, TaskSet, task
+from locust import HttpUser, TaskSet, task
 from random import randint, choice
 
 
@@ -8,7 +8,8 @@ class WebTasks(TaskSet):
 
     @task
     def load(self):
-        base64string = base64.encodestring('%s:%s' % ('user', 'password')).replace('\n', '')
+        x = bytes('%s:%s' % ('user', 'password'), 'utf-8')
+        base64string = base64.b64encode(x).decode()
 
         catalogue = self.client.get("/catalogue").json()
         category_item = choice(catalogue)
@@ -24,7 +25,7 @@ class WebTasks(TaskSet):
         self.client.post("/orders")
 
 
-class Web(HttpLocust):
-    task_set = WebTasks
+class Web(HttpUser):
+    tasks = [WebTasks]
     min_wait = 0
     max_wait = 0
