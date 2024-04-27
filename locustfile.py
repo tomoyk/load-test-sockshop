@@ -1,4 +1,5 @@
 import base64
+import random
 
 from locust import HttpUser, TaskSet, task
 from random import randint, choice
@@ -8,6 +9,8 @@ class WebTasks(TaskSet):
 
     @task
     def load(self):
+        tx_id = random.randint(1, 1000000)
+        print(f"[start]\ttx_id={tx_id}")
         x = bytes('%s:%s' % ('user', 'password'), 'utf-8')
         base64string = base64.b64encode(x).decode()
 
@@ -22,7 +25,10 @@ class WebTasks(TaskSet):
         self.client.delete("/cart")
         self.client.post("/cart", json={"id": item_id, "quantity": 1})
         self.client.get("/basket.html")
-        self.client.post("/orders")
+        x = random.randint(1, 100)
+        if x <= 1.04:
+            print(f"[purchace]\t{tx_id}")
+            self.client.post("/orders")
 
 
 class Web(HttpUser):
