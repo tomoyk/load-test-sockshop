@@ -22,11 +22,19 @@ class WebTasks(TaskSet):
         self.client.get("/login", headers={"Authorization":"Basic %s" % base64string})
         self.client.get("/category.html")
         self.client.get("/detail.html?id={}".format(item_id))
-        self.client.delete("/cart")
-        self.client.post("/cart", json={"id": item_id, "quantity": 1})
-        self.client.get("/basket.html")
+
+        # Add cart: 11618 / 442219
         x = random.randint(1, 100)
-        if x <= 1.04:
+        if x <= 2.62:
+            self.client.delete("/cart")
+            self.client.post("/cart", json={"id": item_id, "quantity": 1})
+            self.client.get("/basket.html")
+        else:
+            return
+
+        # Order: 4621 / 11618
+        x = random.randint(1, 100)
+        if x <= 39.77:
             print(f"[purchace]\t{tx_id}")
             self.client.post("/orders")
 
