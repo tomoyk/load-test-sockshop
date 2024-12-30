@@ -1,4 +1,5 @@
 import base64
+import time
 import random
 
 from locust import HttpUser, TaskSet, task
@@ -21,7 +22,7 @@ class MyCustomShape(LoadTestShape):
             return None
 
         rps = rpmin // 60
-        return (rpmin, self.spawn_rate)
+        return (rpmin, spawn_rate)
 
 class WebTasks(TaskSet):
 
@@ -32,8 +33,14 @@ class WebTasks(TaskSet):
         x = bytes('%s:%s' % ('user', 'password'), 'utf-8')
         base64string = base64.b64encode(x).decode()
 
-        catalogue = self.client.get("/catalogue").json()
-        category_item = choice(catalogue)
+        try:
+            catalogue = self.client.get("/catalogue").json()
+            category_item = choice(catalogue)
+        except KeyError:
+            time.sleep(3)
+            catalogue = self.client.get("/catalogue").json()
+            category_item = choice(catalogue)
+
         item_id = category_item["id"]
 
         self.client.get("/")
