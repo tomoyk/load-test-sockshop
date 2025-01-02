@@ -13,4 +13,5 @@ with open("summary_1min_1202.txt") as f:
             continue
 
 if __name__ == "__main__":
-    print(sec_req)
+    import json
+    print(json.dumps(sec_req))

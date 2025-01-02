@@ -1,4 +1,5 @@
 import base64
+import time
 import random
 
 from locust import HttpUser, TaskSet, task
@@ -8,6 +9,7 @@ from random import randint, choice
 import req_sec
 
 # print(sec_req)
+
 
 class MyCustomShape(LoadTestShape):
     spawn_rate = 1
@@ -21,7 +23,8 @@ class MyCustomShape(LoadTestShape):
             return None
 
         rps = rpmin // 60
-        return (rpmin, self.spawn_rate)
+        return (rpmin, spawn_rate)
+
 
 class WebTasks(TaskSet):
 
@@ -29,15 +32,21 @@ class WebTasks(TaskSet):
     def load(self):
         tx_id = random.randint(1, 1000000)
         # print(f"[start]\ttx_id={tx_id}")
-        x = bytes('%s:%s' % ('user', 'password'), 'utf-8')
+        x = bytes("%s:%s" % ("user", "password"), "utf-8")
         base64string = base64.b64encode(x).decode()
 
-        catalogue = self.client.get("/catalogue").json()
-        category_item = choice(catalogue)
+        try:
+            catalogue = self.client.get("/catalogue").json()
+            category_item = choice(catalogue)
+        except KeyError:
+            time.sleep(3)
+            catalogue = self.client.get("/catalogue").json()
+            category_item = choice(catalogue)
+
         item_id = category_item["id"]
 
         self.client.get("/")
-        self.client.get("/login", headers={"Authorization":"Basic %s" % base64string})
+        self.client.get("/login", headers={"Authorization": "Basic %s" % base64string})
         self.client.get("/category.html")
         self.client.get("/detail.html?id={}".format(item_id))
 
