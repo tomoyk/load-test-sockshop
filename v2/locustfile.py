@@ -10,6 +10,7 @@ import req_sec
 
 # print(sec_req)
 
+
 class MyCustomShape(LoadTestShape):
     spawn_rate = 1
 
@@ -24,13 +25,14 @@ class MyCustomShape(LoadTestShape):
         rps = rpmin // 60
         return (rpmin, spawn_rate)
 
+
 class WebTasks(TaskSet):
 
     @task
     def load(self):
         tx_id = random.randint(1, 1000000)
         # print(f"[start]\ttx_id={tx_id}")
-        x = bytes('%s:%s' % ('user', 'password'), 'utf-8')
+        x = bytes("%s:%s" % ("user", "password"), "utf-8")
         base64string = base64.b64encode(x).decode()
 
         try:
@@ -44,7 +46,7 @@ class WebTasks(TaskSet):
         item_id = category_item["id"]
 
         self.client.get("/")
-        self.client.get("/login", headers={"Authorization":"Basic %s" % base64string})
+        self.client.get("/login", headers={"Authorization": "Basic %s" % base64string})
         self.client.get("/category.html")
         self.client.get("/detail.html?id={}".format(item_id))
 
